@@ -60,6 +60,15 @@ public class BookingService {
         Address address = addressRepository.findById(request.getAddressId())
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
+        // Validate address city matches thekedar location
+        if (address.getCity() != null && thekedar.getLocation() != null) {
+            if (!address.getCity().trim().equalsIgnoreCase(thekedar.getLocation().trim())) {
+                log.warn("Booking failed: City mismatch. Consumer city: {}, Thekedar location: {}", 
+                        address.getCity(), thekedar.getLocation());
+                throw new BadRequestException("Thekedar not available in your city");
+            }
+        }
+
         // Validate team size
         int workersNeeded = request.getWorkersNeeded() != null ? request.getWorkersNeeded() : 1;
         if (thekedar.getTeamSize() == null || thekedar.getTeamSize() < workersNeeded) {

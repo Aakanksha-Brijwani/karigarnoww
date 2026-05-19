@@ -36,13 +36,20 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AddressResponse>> createAddress(
+    public ResponseEntity<ApiResponse<Object>> createAddress(
             @Valid @RequestBody AddressRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
         UUID userId = UUID.fromString(principal.getUserId());
         Address address = addressService.createAddress(request, userId);
+        
+        // Lightweight response as requested
+        var data = java.util.Map.of(
+            "id", address.getId(),
+            "city", address.getCity()
+        );
+        
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "Address created successfully", toAddressResponse(address)));
+                .body(new ApiResponse<>(true, "Address created successfully", data));
     }
 
     @PutMapping("/{id}")

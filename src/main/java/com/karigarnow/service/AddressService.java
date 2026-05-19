@@ -35,10 +35,6 @@ public class AddressService {
 
         List<Address> existingAddresses = addressRepository.findByUserId(userId);
         
-        if (existingAddresses.size() >= 2) {
-            throw new BadRequestException("Maximum 2 addresses allowed per user");
-        }
-
         boolean shouldBePrimary = Boolean.TRUE.equals(request.getIsPrimary()) || existingAddresses.isEmpty();
 
         if (shouldBePrimary) {
